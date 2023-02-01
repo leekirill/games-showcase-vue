@@ -24,14 +24,14 @@
         <ul class="list">
             <li class="list__item" v-for="d,i in data" :key={i}>
                 <img :src="d.background_image" :alt="d.name">
-                <span>{{ d.name }}</span>
+                <strong>{{ d.name }}</strong>
                 <p>{{ d.rating }}</p>
             </li>
         </ul>
         <div class="pagination">
-            <button @click="prevPage">PrevPage</button>
+            <button @click="prevPage">←</button>
             <button @click="changePage" v-for="item,i in maxPages" :key='i'>{{ item }}</button>
-            <button @click="nextPage">NextPage</button>
+            <button @click="nextPage">→</button>
         </div>
 </template>
 
@@ -138,8 +138,9 @@ export default {
     .filterList {
         padding: 0;
         position: absolute;
-        background-color: #fff;
-        border: 1px solid red;
+        background-color: #171717;
+        color: #fff;
+        border: 1px solid #fff;
 
         .item {
             list-style: none;
@@ -149,8 +150,9 @@ export default {
     .sortList {
         padding: 0;
         position: absolute;
-        background-color: #fff;
-        border: 1px solid red;
+        background-color: #171717;
+        color: #fff;
+        border: 1px solid #fff;
 
     .item {
             list-style: none;
@@ -163,14 +165,15 @@ export default {
         justify-content: center;
         margin-top: 60px;
             button {
-                background: #fff;
+                background: #171717;
                 border: 1px solid #a9a9a9;
                 min-width: 40px;
                 height: 40px;
                 transition: 250ms;
+                color: #fff;
                 &:hover {
                     cursor: pointer;
-                    border: 1px solid #000
+                    border: 1px solid rgb(106, 106, 106)
                 }
             }
     }
