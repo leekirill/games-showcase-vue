@@ -48,7 +48,8 @@ export default {
             sortList: false,
             sortName: 'Sort',
             filterList: false,
-            isLoading: false
+            isLoading: false,
+            baseUrl: 'http://localhost:8080/'
         }
     },
     methods: {
@@ -102,6 +103,10 @@ export default {
     },
     mounted() {
         this.getData()
+    },
+    updated() {
+        let url = new URL(`/?query=${this.currentPage}`, this.baseUrl)
+        history.pushState(null, '', url)
     }
 }
 </script>
@@ -118,6 +123,9 @@ export default {
         display: flex;
         flex-direction: column;
         list-style: none;
+        strong {
+            margin-top: 14px;
+        }
         p {
             padding: 0;
             margin: 0;
