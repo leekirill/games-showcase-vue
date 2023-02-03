@@ -1,7 +1,6 @@
 <template>
     <h1>Page {{ currentPage }}</h1>
-        <h2 v-if="isLoading">Loading</h2>
-        <div v-else class="top__line">
+        <div class="top__line">
             <div @mouseenter="toggleFilterList" @mouseleave="toggleFilterList">Filter
                 <Transition>
                     <ul v-show="filterList" class="filterList">
@@ -13,15 +12,14 @@
             </div>
             <div @mouseenter="toggleSortList" @mouseleave="toggleSortList">{{sortName}}
                 <Transition>
-                <ul v-show="sortList" class="sortList">
-                    <li @click="sortData" class="item" aria-label="popularity">By popularity</li>
-                    <li @click="sortData" class="item" aria-label="asc">Rating asc</li>
-                    <li @click="sortData" class="item" aria-label="desc">Rating desc</li>                   
+                <ul v-show="sortList" class="sortList" @click="sortData"> 
+                    <li v-for="s, i in sortArr" :key="i" :class="[(activeId === i) ? 'item--active' : 'item']" @click="setActiveId(i)" :aria-label="s.ariaLabel">{{ s.name }}</li>
                 </ul>
                 </Transition>
             </div>
         </div>
-        <ul class="list">
+        <h2 v-if="isLoading">Loading</h2>
+        <ul v-else class="list">
             <li class="list__item" v-for="d,i in data" :key={i}>
                 <img :src="d.background_image" :alt="d.name">
                 <strong>{{ d.name }}</strong>
@@ -43,7 +41,13 @@ export default {
     data() {
         return {
             data: [],
+            sortArr: [
+                { ariaLabel: 'popularity', name: 'By popularity' },
+                { ariaLabel: 'asc', name: 'Rating asc' },
+                { ariaLabel: 'desc', name: 'Rating desc' }
+            ],
             currentPage: 1,
+            activeId: 0,
             maxPages: null,
             sortList: false,
             sortName: 'Sort',
@@ -67,6 +71,7 @@ export default {
         nextPage() {
             this.currentPage++
             this.getData()
+            this.changeUrl()
         },
         prevPage() {
             if (this.currentPage === 1) {
@@ -74,10 +79,28 @@ export default {
             }
             this.currentPage--
             this.getData()
+            this.changeUrl()
         },
         changePage(e) {
             this.currentPage = parseInt(e.target.innerHTML)
             this.getData()
+            this.changeUrl()
+        },
+        setActiveId(i) {
+            this.activeId = i
+            return this.activeId === i
+        },
+        changeUrl() {
+            let url = new URL(`/?query=${this.currentPage}`, this.baseUrl)
+            history.pushState(null, '', url)
+
+            if (this.currentPage === 1) {
+                this.resetUrl()
+            }
+        },
+        resetUrl() {
+            let url = new URL('/', this.baseUrl)
+            history.pushState(null, '', url)
         },
         toggleFilterList() {
             this.filterList = !this.filterList
@@ -86,28 +109,30 @@ export default {
             this.sortList = !this.sortList
         },
         sortData(e) {
-            if (e.target.ariaLabel === 'desc') {
-                this.data = this.data.sort((a, b) => b.rating - a.rating)
-                this.sortName = e.target.innerHTML
+            if (e.target.nodeName === "LI") {
+                console.log(e.target)
+
+                if (e.target.ariaLabel === 'desc') {
+                    this.data = this.data.sort((a, b) => b.rating - a.rating)
+                    this.sortName = e.target.innerHTML
+                }
+                if (e.target.ariaLabel === 'asc') {
+                    this.data = this.data.sort((a, b) => a.rating - b.rating)
+                    this.sortName = e.target.innerHTML
+                }
+                if (e.target.ariaLabel === 'popularity') {
+                    this.data = this.data.sort((a, b) => a.reviews_count - b.reviews_count)
+                    this.sortName = e.target.innerHTML
+                }
             }
-            if (e.target.ariaLabel === 'asc') {
-                this.data = this.data.sort((a, b) => a.rating - b.rating)
-                this.sortName = e.target.innerHTML
-            }
-            if (e.target.ariaLabel === 'popularity') {
-                this.data = this.data.sort((a, b) => a.reviews_count - b.reviews_count)
-                this.sortName = e.target.innerHTML
-            }
+
         }
 
     },
     mounted() {
         this.getData()
+        this.resetUrl()
     },
-    updated() {
-        let url = new URL(`/?query=${this.currentPage}`, this.baseUrl)
-        history.pushState(null, '', url)
-    }
 }
 </script>
 
@@ -162,9 +187,14 @@ export default {
         color: #fff;
         border: 1px solid #fff;
 
-    .item {
+        .item {
             list-style: none;
-            padding: 20px
+            padding: 20px;
+            cursor: pointer;
+            &--active {
+                @extend .item;
+                color: red;
+            }
         }
     }
     .pagination {
