@@ -1,5 +1,5 @@
 <template>
-    <h1>Page {{ currentPage }}</h1>
+    <h1><a href="/">Page {{ currentPage }}</a></h1>
         <div class="top__line">
             <div @mouseenter="toggleFilterList" @mouseleave="toggleFilterList">Filter
                 <Transition>
@@ -30,7 +30,7 @@
         </ul>
         <div class="pagination">
             <button @click="prevPage">←</button>
-            <button @click="changePage" v-for="item,i in maxPages" :key='i'>{{ item }}</button>
+            <button @click="changePage" :class="[(activeId === i) ? 'pag--active' : 'pag']" v-for="item,i in maxPages" :key='i'>{{ item }}</button>
             <button @click="nextPage">→</button>
         </div>
 </template>
@@ -99,6 +99,7 @@ export default {
             this.currentPage = parseInt(e.target.innerHTML)
             this.getData()
             this.changeUrl()
+            this.setActiveId(this.currentPage - 1)
         },
         setActiveId(i) {
             this.activeId = i
@@ -177,6 +178,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
+a {
+    text-decoration: none;
+    color: #fff;
+}
 .list {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -247,6 +252,14 @@ export default {
         gap: 5px;
         justify-content: center;
         margin-top: 60px;
+        .pag {
+            color: #fff
+        }
+        .pag--active {
+            color: #ffffff;
+            font-weight: 700;
+            background: rgba(255, 255, 255, .1);
+        }
             button {
                 background: #171717;
                 border: 1px solid #a9a9a9;
