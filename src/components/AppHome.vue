@@ -4,9 +4,11 @@
             <div @mouseenter="toggleFilterList" @mouseleave="toggleFilterList">Filter
                 <Transition>
                     <ul v-show="filterList" class="filterList">
-                        <li class="item">By popularity</li>
-                        <li class="item">Rating asc</li>
-                        <li class="item">Rating desc</li>
+                        <li v-for="p, i in platformsData" :key="i" class="item">
+                            <input :id="p.id" type="checkbox" @input="getCheckedFilterItems" class="item__checkbox">
+                            <label :for="p.id">{{ p.name }}</label>
+                        </li>
+                        <button @click="getFilteredData">Save</button>
                     </ul>
                 </Transition>
             </div>
@@ -41,11 +43,13 @@ export default {
     data() {
         return {
             data: [],
+            platformsData: [],
+            filterItems: [],
             sortArr: [
                 { ariaLabel: 'popularity', name: 'By popularity' },
                 { ariaLabel: 'asc', name: 'Rating asc' },
                 { ariaLabel: 'desc', name: 'Rating desc' }
-            ],
+              ],
             currentPage: 1,
             activeId: 0,
             maxPages: null,
@@ -65,6 +69,16 @@ export default {
             );
             const dataRes = await res.json()
             this.data = dataRes.results
+            this.pagination(dataRes)
+        },
+        async getPlatformList() {
+            const res = await fetch(
+                `https://api.rawg.io/api/platforms/lists/parents?key=${API_KEY}`
+            );
+            const platformsData = await res.json()
+            this.platformsData = platformsData.results.sort((a,b) => a.id - b.id)
+        },  
+        pagination(dataRes) {
             this.maxPages = Math.ceil(dataRes.count / dataRes.results.length)
             this.isLoading = false
         },
@@ -110,8 +124,6 @@ export default {
         },
         sortData(e) {
             if (e.target.nodeName === "LI") {
-                console.log(e.target)
-
                 if (e.target.ariaLabel === 'desc') {
                     this.data = this.data.sort((a, b) => b.rating - a.rating)
                     this.sortName = e.target.innerHTML
@@ -125,14 +137,42 @@ export default {
                     this.sortName = e.target.innerHTML
                 }
             }
+        },
+        getCheckedFilterItems(e) {
+            if (e.target.checked) {
+                this.filterItems.push(parseInt(e.target.id))
+            } else {
+                this.filterItems = this.filterItems.filter(item => item !== parseInt(e.target.id))
+            }
+            console.log(this.filterItems)
+        },
+        getFilteredData() {
+            // this.filterItems.forEach(e => console.log(e))
+            let arr = []
 
+            this.data.filter((d) => {
+                d.parent_platforms.filter(p => {
+                    this.filterItems.filter(f => {
+                        if (p.platform.id === f) {
+                            arr.push(d)
+                            return arr
+                        }
+                    })
+                })
+            })
+
+            if (this.filterItems.length === 0) {
+                this.getData()
+            }
+            this.data = Array.from(new Set(arr))
+            console.log(Array.from(new Set(arr)))
         }
-
     },
     mounted() {
         this.getData()
         this.resetUrl()
-    },
+        this.getPlatformList()
+    }
 }
 </script>
 
@@ -169,21 +209,24 @@ export default {
         border: 1px solid #a9a9a9;
     }
     .filterList {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
         padding: 0;
         position: absolute;
-        background-color: #171717;
+        background-color: #171717f4;
         color: #fff;
         border: 1px solid #fff;
 
         .item {
             list-style: none;
-            padding: 20px
+            padding: 20px;
+            text-align: left;
         }
     }
     .sortList {
         padding: 0;
         position: absolute;
-        background-color: #171717;
+        background-color: #171717f4;
         color: #fff;
         border: 1px solid #fff;
 
@@ -193,7 +236,9 @@ export default {
             cursor: pointer;
             &--active {
                 @extend .item;
-                color: red;
+                color: #ffffff;
+                font-weight: 700;
+                background: rgba(255, 255, 255, .1);
             }
         }
     }
@@ -215,6 +260,20 @@ export default {
                 }
             }
     }
+
+    // .item__checkbox {
+    //     display: none;
+    // }
+    // .item__checkbox::before {
+    //     content: '';
+    //     display: inline;
+    //     width: 20px;
+    //     height: 20px;
+    //     background-color: transparent;
+    //     border: 1px solid #fff
+    // }
+
+
 
     .v-enter-active,
     .v-leave-active {
