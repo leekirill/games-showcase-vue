@@ -68,7 +68,7 @@ export default {
             this.isLoading = true
 
             const res = await fetch(
-                `https://api.rawg.io/api/games?key=${API_KEY}&dates=2022-09-01,2022-12-30${this.filterItems ?? '&platforms=' + this.filterItems.join(',')}&page=${this.currentPage}`
+                `https://api.rawg.io/api/games?key=${API_KEY}&dates=2022-09-01,2022-12-30${this.getFilteredPlatforms}&page=${this.currentPage}`
             );
             const dataRes = await res.json()
             this.data = dataRes.results
@@ -159,6 +159,12 @@ export default {
             this.getData()
             this.activeId = 0
             this.currentPage = 1
+        }
+    },
+    computed: {
+        getFilteredPlatforms() {
+            console.log(this.filterItems.join(','))
+            return this.filterItems ?? '&platforms=' + this.filterItems.join(',')
         }
     },
     mounted() {
@@ -311,6 +317,7 @@ a {
 
     .search  {
         background: none;
+        color: #fff;
         outline: none;
         border: 1px solid #545454;
         padding: 8px 10px;
