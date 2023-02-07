@@ -13,7 +13,7 @@
                 </Transition>
             </div>
             <div>
-                <input type="text" name="" placeholder="Search" class='search'>
+                <input type="text" name="" placeholder="Search" class='search' @change="getSearchQuery">
             </div>
             <div @mouseenter="toggleSortList" @mouseleave="toggleSortList">{{sortName}}
                 <Transition>
@@ -33,7 +33,10 @@
         </ul>
         <div class="pagination">
             <button @click="prevPage">←</button>
-            <button @click="changePage" :class="[(activeId === i) ? 'pag--active' : 'pag']" v-for="item,i in maxPages" :key='i'>{{ item }}</button>
+            <button @click="changePage" :class="[(activeId === i) ? 'pag--active' : 'pag']" v-for="item,i in 10" :key='i'>{{ item }}</button>
+            <button class="pag">...</button>
+            <button @click="changePage" :class="[(activeId === i) ? 'pag--active' : 'pag']">{{ this.maxPages }}</button>
+
             <button @click="nextPage">→</button>
         </div>
 </template>
@@ -48,6 +51,7 @@ export default {
             data: [],
             platformsData: [],
             filterItems: [],
+            searchQuery: '',
             sortArr: [
                 { ariaLabel: 'popularity', name: 'By popularity' },
                 { ariaLabel: 'asc', name: 'Rating asc' },
@@ -68,7 +72,7 @@ export default {
             this.isLoading = true
 
             const res = await fetch(
-                `https://api.rawg.io/api/games?key=${API_KEY}&dates=2022-09-01,2022-12-30${this.getFilteredPlatforms}&page=${this.currentPage}`
+                `https://api.rawg.io/api/games?key=${API_KEY}${this.getFilteredPlatforms}&page=${this.currentPage}&search=${this.searchQuery}`
             );
             const dataRes = await res.json()
             this.data = dataRes.results
@@ -81,13 +85,12 @@ export default {
             const platformsData = await res.json()
             this.platformsData = platformsData.results.sort((a,b) => a.id - b.id)
         },  
-        pagination() {
-            // this.maxPages = Math.ceil(dataRes.count / dataRes.results.length)
-            this.maxPages = 10
-            if (this.currentPage > 8) {
-                return this.maxPages * 2
-            }
+        pagination(dataRes) {
+            this.maxPages = Math.ceil(dataRes.count / dataRes.results.length)
             this.isLoading = false
+        },
+        actualPagesCount() {
+            return 10
         },
         nextPage() {
             this.currentPage++
@@ -156,6 +159,12 @@ export default {
         },
         getFilteredData() {
             console.log(this.filterItems.join(','))
+            this.getData()
+            this.activeId = 0
+            this.currentPage = 1
+        },
+        getSearchQuery(e) {
+            this.searchQuery = e.target.value
             this.getData()
             this.activeId = 0
             this.currentPage = 1
