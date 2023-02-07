@@ -1,16 +1,19 @@
 <template>
     <h1><a href="/">Page {{ currentPage }}</a></h1>
         <div class="top__line">
-            <div @mouseenter="toggleFilterList" @mouseleave="toggleFilterList">Filter
+            <div @mouseenter="data && toggleFilterList" @mouseleave="toggleFilterList">Filter
                 <Transition>
                     <ul v-show="filterList" class="filterList">
                         <li v-for="p, i in platformsData" :key="i" class="item">
                             <input :id="p.id" type="checkbox" @input="getCheckedFilterItems" class="item__checkbox">
                             <label :for="p.id">{{ p.name }}</label>
                         </li>
-                        <button @click="getFilteredData">Save</button>
+                        <button @click="getFilteredData" class="filterBtn">Save</button>
                     </ul>
                 </Transition>
+            </div>
+            <div>
+                <input type="text" name="" placeholder="Search" class='search'>
             </div>
             <div @mouseenter="toggleSortList" @mouseleave="toggleSortList">{{sortName}}
                 <Transition>
@@ -65,7 +68,7 @@ export default {
             this.isLoading = true
 
             const res = await fetch(
-                `https://api.rawg.io/api/games?key=${API_KEY}&dates=2019-09-01,2019-09-30&platforms=18,1,7&page=${this.currentPage}`
+                `https://api.rawg.io/api/games?key=${API_KEY}&dates=2022-09-01,2022-12-30${this.filterItems ?? '&platforms=' + this.filterItems.join(',')}&page=${this.currentPage}`
             );
             const dataRes = await res.json()
             this.data = dataRes.results
@@ -78,8 +81,12 @@ export default {
             const platformsData = await res.json()
             this.platformsData = platformsData.results.sort((a,b) => a.id - b.id)
         },  
-        pagination(dataRes) {
-            this.maxPages = Math.ceil(dataRes.count / dataRes.results.length)
+        pagination() {
+            // this.maxPages = Math.ceil(dataRes.count / dataRes.results.length)
+            this.maxPages = 10
+            if (this.currentPage > 8) {
+                return this.maxPages * 2
+            }
             this.isLoading = false
         },
         nextPage() {
@@ -148,25 +155,10 @@ export default {
             console.log(this.filterItems)
         },
         getFilteredData() {
-            // this.filterItems.forEach(e => console.log(e))
-            let arr = []
-
-            this.data.filter((d) => {
-                d.parent_platforms.filter(p => {
-                    this.filterItems.filter(f => {
-                        if (p.platform.id === f) {
-                            arr.push(d)
-                            return arr
-                        }
-                    })
-                })
-            })
-
-            if (this.filterItems.length === 0) {
-                this.getData()
-            }
-            this.data = Array.from(new Set(arr))
-            console.log(Array.from(new Set(arr)))
+            console.log(this.filterItems.join(','))
+            this.getData()
+            this.activeId = 0
+            this.currentPage = 1
         }
     },
     mounted() {
@@ -209,7 +201,8 @@ a {
     .top__line {
         display: flex;
         justify-content: space-between;
-        padding: 16px 20px;
+        align-items: center;
+        padding: 8px 20px;
         margin-bottom: 20px;
         border: 1px solid #a9a9a9;
     }
@@ -226,6 +219,17 @@ a {
             list-style: none;
             padding: 20px;
             text-align: left;
+        }
+        .filterBtn {
+            border-top: 1px solid #fff;
+            border-left: 1px solid #fff;
+            background-color: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: 250ms;
+            &:hover {
+                background-color: black;
+            }
         }
     }
     .sortList {
@@ -274,17 +278,48 @@ a {
             }
     }
 
-    // .item__checkbox {
-    //     display: none;
-    // }
-    // .item__checkbox::before {
-    //     content: '';
-    //     display: inline;
-    //     width: 20px;
-    //     height: 20px;
-    //     background-color: transparent;
-    //     border: 1px solid #fff
-    // }
+    .item__checkbox {
+        position: absolute;
+        z-index: -1;
+        opacity: 0;
+    }
+    .item__checkbox+label {
+        display: inline-flex;
+        align-items: center;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    .item__checkbox+label::before {
+        content: '';
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        flex-shrink: 0;
+        flex-grow: 0;
+        border: 1px solid #adb5bd;
+        margin-right: 0.5em;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 50% 50%;
+    }
+    .item__checkbox:checked+label::before {
+        border-color: #fff;
+        background-color: transparent;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
+    }
+
+    .search  {
+        background: none;
+        outline: none;
+        border: 1px solid #545454;
+        padding: 8px 10px;
+        min-width: 400px;
+        transition: 250ms;
+        &:hover {
+            border: 1px solid #a9a9a9;
+        }
+    }
 
 
 
