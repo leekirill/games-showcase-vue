@@ -1,7 +1,7 @@
 <template>
     <h1><a href="/">Page {{ currentPage }}</a></h1>
         <div class="top__line">
-            <div @mouseenter="data && toggleFilterList" @mouseleave="toggleFilterList">Filter
+            <div class="top__left" @mouseenter="data && toggleFilterList" @mouseleave="toggleFilterList">Filter
                 <Transition>
                     <ul v-show="filterList" class="filterList">
                         <li v-for="p, i in platformsData" :key="i" class="item">
@@ -15,7 +15,7 @@
             <div>
                 <input type="text" name="" placeholder="Search" class='search' @change="getSearchQuery">
             </div>
-            <div @mouseenter="toggleSortList" @mouseleave="toggleSortList">{{sortName}}
+            <div class="top__right" @mouseenter="toggleSortList" @mouseleave="toggleSortList">{{sortName}}
                 <Transition>
                 <ul v-show="sortList" class="sortList" @click="sortData"> 
                     <li v-for="s, i in sortArr" :key="i" :class="[(activeId === i) ? 'item--active' : 'item']" @click="setActiveId(i)" :aria-label="s.ariaLabel">{{ s.name }}</li>
@@ -25,7 +25,7 @@
         </div>
         <h2 v-if="isLoading">Loading</h2>
         <ul v-else class="list">
-            <li class="list__item" v-for="d,i in data" :key={i}>
+            <li class="list__item" v-for="d,i in data" :key="i">
                 <img :src="d.background_image" :alt="d.name">
                 <strong>{{ d.name }}</strong>
                 <p>{{ d.rating }}</p>
@@ -35,7 +35,7 @@
             <button @click="prevPage">←</button>
             <button @click="changePage" :class="[(activeId === i) ? 'pag--active' : 'pag']" v-for="item,i in 10" :key='i'>{{ item }}</button>
             <button class="pag">...</button>
-            <button @click="changePage" :class="[(activeId === i) ? 'pag--active' : 'pag']">{{ this.maxPages }}</button>
+            <button @click="changePage" class="pag">{{ this.maxPages }}</button>
 
             <button @click="nextPage">→</button>
         </div>
@@ -72,7 +72,7 @@ export default {
             this.isLoading = true
 
             const res = await fetch(
-                `https://api.rawg.io/api/games?key=${API_KEY}${this.getFilteredPlatforms}&page=${this.currentPage}&search=${this.searchQuery}`
+                `https://api.rawg.io/api/games?key=${API_KEY}${this.getFilteredPlatforms}${this.getSearchedData}&page=${this.currentPage}`
             );
             const dataRes = await res.json()
             this.data = dataRes.results
@@ -174,6 +174,9 @@ export default {
         getFilteredPlatforms() {
             console.log(this.filterItems.join(','))
             return this.filterItems ?? '&platforms=' + this.filterItems.join(',')
+        },
+        getSearchedData() {
+            return '&search=' + this.searchQuery
         }
     },
     mounted() {
@@ -213,13 +216,18 @@ a {
         height: 160px;
         object-fit: cover;
     }
-    .top__line {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 20px;
-        margin-bottom: 20px;
-        border: 1px solid #a9a9a9;
+    .top {
+        &__line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #a9a9a9;
+        }
+        &__left, &__right {
+            min-width: 100px
+        }
     }
     .filterList {
         display: grid;
