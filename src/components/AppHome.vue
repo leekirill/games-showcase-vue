@@ -25,7 +25,7 @@
         </div>
         <h2 v-if="isLoading">Loading</h2>
         <ul v-else class="list">
-            <li class="list__item" v-for="d,i in data" :key="i">
+            <li class="list__item" v-for="d,i in data" :key="i" @click="openItem(d.id)">
                 <img :src="d.background_image" :alt="d.name">
                 <strong>{{ d.name }}</strong>
                 <p>{{ d.rating }}</p>
@@ -52,6 +52,7 @@ export default {
             platformsData: [],
             filterItems: [],
             searchQuery: '',
+            itemId: 0,
             sortArr: [
                 { ariaLabel: 'popularity', name: 'By popularity' },
                 { ariaLabel: 'asc', name: 'Rating asc' },
@@ -78,6 +79,13 @@ export default {
             this.data = dataRes.results
             this.pagination(dataRes)
         },
+        async getItemData() {
+            const res = await fetch(
+                `https://api.rawg.io/api/games/${this.itemId}?key=${API_KEY}`
+            );
+            const dataRes = await res.json()
+            console.log(dataRes)
+        },
         async getPlatformList() {
             const res = await fetch(
                 `https://api.rawg.io/api/platforms/lists/parents?key=${API_KEY}`
@@ -85,6 +93,11 @@ export default {
             const platformsData = await res.json()
             this.platformsData = platformsData.results.sort((a,b) => a.id - b.id)
         },  
+        openItem(i) {
+            console.log(i)
+            this.itemId = i
+            this.getItemData()
+        },
         pagination(dataRes) {
             this.maxPages = Math.ceil(dataRes.count / dataRes.results.length)
             this.isLoading = false
@@ -203,6 +216,11 @@ a {
         display: flex;
         flex-direction: column;
         list-style: none;
+        cursor: pointer;
+        transition: 250ms;
+        &:hover {
+            background-color:#2e2e2e;
+        }
         strong {
             margin-top: 14px;
         }
