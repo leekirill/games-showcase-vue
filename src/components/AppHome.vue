@@ -205,7 +205,7 @@ a {
             color: #fff
         }
         .pag--active {
-            color: #ffffff;
+            color: #ff0000;
             font-weight: 700;
             background: rgba(255, 255, 255, .1);
         }
