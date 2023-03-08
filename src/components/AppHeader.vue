@@ -26,6 +26,8 @@
 </template>
 
 <script>
+const API_KEY = "bc22c20a2222477ea32564d9ac421797";
+
 export default {
     props: {
         dataProp: {
@@ -49,6 +51,14 @@ export default {
         }
     },
     methods: {
+        async getPlatformList() {
+            const res = await fetch(
+                `https://api.rawg.io/api/platforms/lists/parents?key=${API_KEY}`
+            );
+            const platformsData = await res.json()
+            this.platformsData = platformsData.results.sort((a, b) => a.id - b.id)
+            console.log(this.platformsData)
+        },
         toggleFilterList() {
             this.showFilterList = !this.showFilterList
         },
@@ -79,6 +89,9 @@ export default {
             this.activeId = i
             return this.activeId === i
         }
+    },
+    mounted() {
+        this.getPlatformList()
     }
 }
 </script>

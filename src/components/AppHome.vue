@@ -62,14 +62,7 @@ export default {
             );
             const dataRes = await res.json()
             console.log(dataRes)
-        },
-        async getPlatformList() {
-            const res = await fetch(
-                `https://api.rawg.io/api/platforms/lists/parents?key=${API_KEY}`
-            );
-            const platformsData = await res.json()
-            this.platformsData = platformsData.results.sort((a,b) => a.id - b.id)
-        },  
+        }, 
         openItem(i) {
             console.log(i)
             this.itemId = i
@@ -154,7 +147,6 @@ export default {
     mounted() {
         this.getData()
         this.resetUrl()
-        this.getPlatformList()
     }
 }
 </script>
