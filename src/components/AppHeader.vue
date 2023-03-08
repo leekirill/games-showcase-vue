@@ -1,6 +1,6 @@
 <template>
         <div class="top__line">
-            <div class="top__left" @mouseenter="dataProp && toggleFilterList" @mouseleave="toggleFilterList">Filter
+            <div class="top__left" @mouseenter="toggleFilterList" @mouseleave="toggleFilterList">Filter
                 <Transition>
                     <ul v-show="showFilterList" class="filterList">
                         <li v-for="p, i in platformsData" :key="i" class="item">
@@ -42,8 +42,6 @@ export default {
                 { ariaLabel: 'desc', name: 'Rating desc' }
             ],
             platformsData: [],
-            filterItems: [],
-            searchQuery: '',
             sortName: 'Sort',
             sortList: false,
             showFilterList: false,
@@ -100,7 +98,8 @@ export default {
         border: 1px solid #a9a9a9;
     }
     &__left, &__right {
-        min-width: 100px
+        min-width: 100px;
+        border: 1px solid red;
     }
 }
 

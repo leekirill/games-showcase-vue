@@ -1,6 +1,6 @@
 <template>
     <h1><a href="/">Page {{ currentPage }}</a></h1>
-        <app-header :dataProp="data" :activeId="activeId" @searchQuery="getSearchQuery" @sortData="sortData" @getCheckedFilterItems="getCheckedFilterItems" @getFilteredData="getFilteredData"></app-header>
+        <app-header :activeId="activeId" @searchQuery="getSearchQuery" @sortData="sortData" @getCheckedFilterItems="getCheckedFilterItems" @getFilteredData="getFilteredData"></app-header>
     <div v-if="isLoading">
       <rotate-loader label="Loading..." color="#fff"></rotate-loader>
     </div>        
@@ -123,6 +123,7 @@ export default {
             } else {
                 this.filterItems = this.filterItems.filter(item => item !== parseInt(e.target.id))
             }
+            console.log(this.filterItems)
         },
         getFilteredData() {
             this.getData()
