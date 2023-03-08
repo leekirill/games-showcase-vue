@@ -66,17 +66,10 @@ export default {
             this.sortList = !this.sortList
         },
         getCheckedFilterItems(e) {
-            if (e.target.checked) {
-                this.filterItems.push(parseInt(e.target.id))
-            } else {
-                this.filterItems = this.filterItems.filter(item => item !== parseInt(e.target.id))
-            }
-            console.log(this.filterItems)
+            this.$emit('getCheckedFilterItems', e)
         },
         getFilteredData() {
-            this.getData()
-            this.activeId = 0
-            this.currentPage = 1
+            this.$emit('getFilteredData')
         },
         getSearchQuery(e) {
             this.$emit('searchQuery', e.target.value)

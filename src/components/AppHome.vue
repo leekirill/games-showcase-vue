@@ -1,6 +1,6 @@
 <template>
     <h1><a href="/">Page {{ currentPage }}</a></h1>
-        <app-header :dataProp="data" :activeId="activeId" @searchQuery="getSearchQuery" @sortData="sortData"></app-header>
+        <app-header :dataProp="data" :activeId="activeId" @searchQuery="getSearchQuery" @sortData="sortData" @getCheckedFilterItems="getCheckedFilterItems" @getFilteredData="getFilteredData"></app-header>
     <div v-if="isLoading">
       <rotate-loader label="Loading..." color="#fff"></rotate-loader>
     </div>        
@@ -117,7 +117,20 @@ export default {
             this.activeId = 0
             this.currentPage = 1
         },
-        sortData(e) {
+        getCheckedFilterItems(e) {
+            if (e.target.checked) {
+                this.filterItems.push(parseInt(e.target.id))
+            } else {
+                this.filterItems = this.filterItems.filter(item => item !== parseInt(e.target.id))
+            }
+            console.log(this.filterItems)
+        },
+        getFilteredData() {
+            this.getData()
+            this.activeId = 0
+            this.currentPage = 1
+        },
+         sortData(e) {
             if (e.target.nodeName === "LI") {
                 if (e.target.ariaLabel === 'desc') {
                     this.data = this.data.sort((a, b) => b.rating - a.rating)
