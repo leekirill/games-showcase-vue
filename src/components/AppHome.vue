@@ -123,7 +123,6 @@ export default {
             } else {
                 this.filterItems = this.filterItems.filter(item => item !== parseInt(e.target.id))
             }
-            console.log(this.filterItems)
         },
         getFilteredData() {
             this.getData()
@@ -151,10 +150,10 @@ export default {
     },
     computed: {
         getFilteredPlatforms() {
-            return this.filterItems ?? '&platforms=' + this.filterItems.join(',')
+            return this.filterItems.length > 0 ? '&platforms=' + this.filterItems.join(',') : ''
         },
         getSearchedData() {
-            return '&search=' + this.searchValue
+            return this.searchValue.length > 0 ? '&search=' + this.searchValue : ''
         }
     },
     mounted() {
