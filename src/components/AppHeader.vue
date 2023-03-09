@@ -1,6 +1,6 @@
 <template>
         <div class="top__line">
-            <div class="top__left" @mouseenter="toggleFilterList" @mouseleave="toggleFilterList">Filter
+            <div class="top__left" @click="toggleFilterList">Filter
                 <Transition>
                     <ul v-show="showFilterList" class="filterList">
                         <li v-for="p, i in platformsData" :key="i" class="item">
@@ -14,7 +14,7 @@
             <div>
                 <input type="text" name="" placeholder="Search" class='search' @change="getSearchQuery">
             </div>
-            <div class="top__right" @mouseenter="toggleSortList" @mouseleave="toggleSortList">{{ sortName }}
+            <div class="top__right" @click="toggleSortList">{{ sortName }}
                 <Transition>
                     <ul v-show="sortList" class="sortList" @click="sortData">
                         <li v-for="s, i in sortArr" :key="i" :class="[(activeId === i) ? 'item--active' : 'item']"
@@ -93,13 +93,17 @@ export default {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 8px 20px;
+        padding: 0 20px;
         margin-bottom: 20px;
         border: 1px solid #a9a9a9;
     }
     &__left, &__right {
         min-width: 100px;
+        padding: 16px 0;
         border: 1px solid red;
+        &:hover {
+            cursor: pointer;
+        }
     }
 }
 

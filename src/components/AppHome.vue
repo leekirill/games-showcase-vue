@@ -76,7 +76,7 @@ export default {
             return 10
         },
         nextPage() {
-            this.currentPage++
+            this.currentPage += 1
             this.getData()
             this.changeUrl()
         },
